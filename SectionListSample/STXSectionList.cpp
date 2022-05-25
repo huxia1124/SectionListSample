@@ -2,6 +2,7 @@
 
 #define STXBOOLINGLIST_SECTION_CAPTION_HEIGHT		26
 #define STXBOOLINGLIST_SECTION_SPACING				22
+#define STXBOOLINGLIST_SECTION_MARGIN				4
 #define STXBOOLINGLIST_MARGIN						4
 #define STXBOOLINGLIST_CONTENT_MARGIN				8
 #define STXBOOLINGLIST_CONTENT_SIZE					96
@@ -466,7 +467,7 @@ void CSTXSectionListTitleNode::DrawNode(CSTXGraphics *pGraphics)
 
 	pGraphics->FillRectangle(0, 0, static_cast<int>(w), ch, pBrush);
 
-	pGraphics->DrawString(_caption.c_str(), 0, 0, w, ch, pFont, pBrushFont, &tf);
+	pGraphics->DrawString(_caption.c_str(), STXBOOLINGLIST_SECTION_MARGIN, 0, w - 2 * STXBOOLINGLIST_SECTION_MARGIN, ch, pFont, pBrushFont, &tf);
 
 	pGraphics->SetTransform(pMatrixOld);
 
