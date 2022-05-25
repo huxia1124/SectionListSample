@@ -307,7 +307,11 @@ void CSTXSectionList::RemoveItemFromSection(int nSectionIndex, int nItemIndex)
 			AdjustSectionLocationsFromIndex(nSectionIndex, -(STXBOOLINGLIST_CONTENT_SIZE + STXBOOLINGLIST_CONTENT_SPACING));
 		}
 		DOUBLE fSectionHeight = pSectionNode->GetFinalValue(_T("height"));
-		DOUBLE fSectionDstHeight = fSectionHeight - (STXBOOLINGLIST_CONTENT_SIZE + STXBOOLINGLIST_CONTENT_SPACING);
+		DOUBLE fSectionDstHeight = STXBOOLINGLIST_SECTION_CAPTION_HEIGHT + STXBOOLINGLIST_CONTENT_MARGIN + nLineNew * (STXBOOLINGLIST_CONTENT_SIZE + STXBOOLINGLIST_CONTENT_SPACING) - STXBOOLINGLIST_CONTENT_SPACING;
+		if (nLineNew == 0)
+		{
+			fSectionDstHeight += STXBOOLINGLIST_CONTENT_SPACING;
+		}
 		pSectionNode->SetValue(_T("height"), fSectionDstHeight);
 
 		ResetScrollBars();
