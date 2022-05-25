@@ -258,7 +258,7 @@ protected:
 	virtual void OnRButtonDown(int x, int y, UINT nFlags);
 	virtual void OnRButtonUp(int x, int y, UINT nFlags);
 	virtual void OnLButtonDblClk(int x, int y, UINT nFlags);
-	void OnMouseWheel(UINT nFlags, short zDelta, int x, int y);
+	virtual void OnMouseWheel(UINT nFlags, short zDelta, int x, int y);
 	void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	void OnKeyDown_Left();
 	void OnKeyDown_Right();

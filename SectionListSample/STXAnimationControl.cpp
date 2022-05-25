@@ -104,13 +104,6 @@ void CSTXAnimationControlChildNode::DrawNode(CSTXGraphics *pGraphics)
 	//ANI_VAR_VALUE(w, width);
 	//ANI_VAR_VALUE(h, height);
 
-	////CSTXGraphicsBrush *pBrush = pGraphics->CreateSolidBrush(255, 0, 0, 255);
-	//CSTXGraphicsBrush *pBrush = pGraphics->CreateSimpleLinearGradientBrush(x,y, 255, 0, 0, 255, x+w, y+h, 255,255,255,255);
-
-	//pGraphics->FillRectangle(x, y, w, h, pBrush);
-
-	//delete pBrush;
-
 	CSTXAnimationControlWindow *pWnd = dynamic_cast<CSTXAnimationControlWindow*>(_parentControl);
 	if (pWnd)
 	{
@@ -1230,6 +1223,9 @@ LRESULT CALLBACK CSTXAnimationControlWindow::STXAnimatedControlWindowProc(HWND h
 	case WM_MOUSELEAVE:
 		pThis->OnMouseLeave();
 		break;
+	case WM_MOUSEWHEEL:
+		pThis->OnMouseWheel(GET_KEYSTATE_WPARAM(wParam), GET_WHEEL_DELTA_WPARAM(wParam), LOWORD(lParam), HIWORD(lParam));
+		break;
 	case WM_SIZE:
 		pThis->OnSize(wParam, LOWORD(lParam), HIWORD(lParam));
 		break;
@@ -1290,9 +1286,6 @@ BOOL CSTXAnimationControlWindow::Create(LPCTSTR lpszWindowText, DWORD dwStyle, i
 		GetModuleHandle(NULL),
 		NULL);
 
-	//SetWindowPos(_hwndToolTips, HWND_TOPMOST, 0, 0, 0, 0,
-	//	SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
-
 	TOOLINFO toolInfo = { 0 };
 	toolInfo.cbSize = TTTOOLINFO_V1_SIZE;
 	toolInfo.hwnd = hWnd;
@@ -1301,17 +1294,6 @@ BOOL CSTXAnimationControlWindow::Create(LPCTSTR lpszWindowText, DWORD dwStyle, i
 	toolInfo.lpszText = LPSTR_TEXTCALLBACK;
 	GetClientRect(hWnd, &toolInfo.rect);
 	SendMessage(_hwndToolTips, TTM_ADDTOOL, 0, (LPARAM)&toolInfo);
-
-	//toolInfo.cbSize = sizeof(TOOLINFO);
-	//toolInfo.uFlags = TTF_SUBCLASS | TTF_IDISHWND | TTF_TRACK | TTF_ABSOLUTE;
-	//toolInfo.hwnd = hWnd;
-	//toolInfo.hinst = GetModuleHandle(NULL);
-	//toolInfo.lpszText = _T("sasd");
-	//toolInfo.uId = (UINT_PTR)hWnd;
-
-	//GetClientRect(hWnd, &g_toolItem.rect);
-	//SendMessage(_hwndToolTips, TTM_ADDTOOL, 0, (LPARAM)&toolInfo);
-
 
 	return TRUE;
 
@@ -1343,7 +1325,6 @@ void CSTXAnimationControlWindow::OnPaint(HDC hDC)
 	CSTXGraphics *pGraphics = NULL;
 
 	pGraphics = CSTXGraphics::CreateAutoGraphics(_hwndControl, hDC, rcControl.right - rcControl.left, rcControl.bottom - rcControl.top, _graphicsCacheId);
-	//pGraphics = CSTXGraphics::CreateGdiPlusGraphics(_hwndControl, hDC, rcControl.right - rcControl.left, rcControl.bottom - rcControl.top, _graphicsCacheId);
 
 	pGraphics->BeginDraw();
 
@@ -1351,8 +1332,6 @@ void CSTXAnimationControlWindow::OnPaint(HDC hDC)
 	DrawControl(pGraphics);
 
 	HRESULT hr = pGraphics->EndDraw();
-
-	//PostDrawControl(pGraphics);
 
 #if _WIN32_WINNT >= 0x0601
 	if (hr == D2DERR_RECREATE_TARGET)
@@ -1459,39 +1438,16 @@ void CSTXAnimationControlWindow::StopAnimationTimer()
 	::KillTimer(_hwndControl, STXANIMATIONCONTROL_TIMER_ID_ANIMATION);
 }
 
-void CSTXAnimationControlWindow::DrawBackground(CSTXGraphics *pGraphics)
+void CSTXAnimationControlWindow::DrawBackground(CSTXGraphics* pGraphics)
 {
-	//if (m_pImgBackground)
-	//{
-	//	if (!m_pImgBackgroundCached)
-	//	{
-	//		Gdiplus::Bitmap* pBitmap = new Gdiplus::Bitmap(rectThis->Width, rectThis->Height);
-	//		Gdiplus::Graphics graphics(pBitmap);
-	//		graphics.DrawImage(m_pImgBackground.get(), 0, 0, rectThis->Width, rectThis->Height);
+	CSTXGraphicsBrush* pBrush = pGraphics->CreateSolidBrush(255, 255, 255, 255);
+	pBrush->SetOpacity(255);
+	RECT rcControl;
+	::GetClientRect(_hwndControl, &rcControl);
 
-	//		Gdiplus::Bitmap *pBitmapSrc = pBitmap;
-	//		std::tr1::shared_ptr<Gdiplus::CachedBitmap> imgCached(new Gdiplus::CachedBitmap(pBitmapSrc, pGraphics));
-	//		m_pImgBackgroundCached = imgCached;
+	pGraphics->FillRectangle(rcControl.left, rcControl.top, rcControl.right - rcControl.left, rcControl.bottom - rcControl.top, pBrush);
 
-	//		delete pBitmap;
-	//	}
-	//	if (m_pImgBackgroundCached)
-	//		pGraphics->DrawCachedBitmap(m_pImgBackgroundCached.get(), 0, 0);
-	//	else
-	//		pGraphics->DrawImage(m_pImgBackground.get(), rectThis->X, rectThis->Y, rectThis->Width, rectThis->Height);
-	//}
-	//else
-	{
-		//Gdiplus::SolidBrush brushBk(m_clrBackground);
-		CSTXGraphicsBrush *pBrush = pGraphics->CreateSolidBrush(255, 255, 255, 255);
-		pBrush->SetOpacity(255);
-		RECT rcControl;
-		::GetClientRect(_hwndControl, &rcControl);
-
-		pGraphics->FillRectangle(rcControl.left, rcControl.top, rcControl.right - rcControl.left, rcControl.bottom - rcControl.top, pBrush);
-
-		pBrush->Release();
-	}
+	pBrush->Release();
 }
 
 void CSTXAnimationControlWindow::OnMouseMove(int x, int y, UINT nFlags)
@@ -1565,6 +1521,28 @@ void CSTXAnimationControlWindow::OnLButtonDblClk(int x, int y, UINT nFlags)
 	int iHScrollPos = GetScrollPos(_hwndControl, SB_HORZ);
 	int iVScrollPos = GetScrollPos(_hwndControl, SB_VERT);
 	__super::OnLButtonDblClk(x + iHScrollPos, y + iVScrollPos, nFlags);
+}
+
+void CSTXAnimationControlWindow::OnMouseWheel(UINT nFlags, short zDelta, int x, int y)
+{
+	if (!((GetWindowLong(_hwndControl, GWL_STYLE) & WS_VSCROLL) == WS_VSCROLL))
+	{
+		return;
+	}
+
+	int minpos;
+	int maxpos;
+	GetScrollRange(_hwndControl, SB_VERT, &minpos, &maxpos);
+	maxpos = GetScrollLimit(SB_VERT);
+
+	// Get the current position of scroll box.
+	int curpos = GetScrollPos(_hwndControl, SB_VERT);
+	int newpos = curpos - zDelta;
+	newpos = min(newpos, maxpos);
+	newpos = max(newpos, minpos);
+
+	SetScrollPos(_hwndControl, SB_VERT, newpos, TRUE);
+	InvalidateRect(_hwndControl, NULL, TRUE);
 }
 
 BOOL CSTXAnimationControlWindow::ModifyStyle(int nStyleOffset, DWORD dwRemove, DWORD dwAdd, UINT nFlags)
@@ -2700,246 +2678,3 @@ CSTXAnimationControl::~CSTXAnimationControl()
 {
 
 }
-//
-//void CSTXAnimationControl::InitializeChildNode(CSTXAnimationControlChildNode *pNode, std::map<std::wstring, DOUBLE> *initialValues)
-//{
-//	if (initialValues)
-//	{
-//		std::map<std::wstring, DOUBLE>::iterator itInitial = initialValues->begin();
-//		for (; itInitial != initialValues->end(); itInitial++)
-//		{
-//			CComPtr<IUIAnimationVariable> spVar;
-//			_animationManager.CreateAnimationVariable(itInitial->second, &spVar);
-//			pNode->_animationVariables[itInitial->first] = spVar;
-//		}
-//	}
-//
-//	std::vector<std::pair<std::wstring, double>> arrInitialVariables;
-//	arrInitialVariables.push_back(std::pair<std::wstring, double>(_T("x"), 0));
-//	arrInitialVariables.push_back(std::pair<std::wstring, double>(_T("y"), 0));
-//	arrInitialVariables.push_back(std::pair<std::wstring, double>(_T("width"), 1));
-//	arrInitialVariables.push_back(std::pair<std::wstring, double>(_T("height"), 1));
-//
-//	std::vector<std::pair<std::wstring, double>>::iterator it = arrInitialVariables.begin();
-//	for (; it != arrInitialVariables.end(); it++)
-//	{
-//		if (initialValues && initialValues->find(it->first) != initialValues->end())
-//			continue;
-//
-//		CComPtr<IUIAnimationVariable> spVar;
-//		_animationManager.CreateAnimationVariable(it->second, &spVar);
-//		pNode->_animationVariables[it->first] = spVar;
-//	}
-//
-//	pNode->_parentControl = this;
-//}
-//
-//void CSTXAnimationControl::UpdateAnimationManager()
-//{
-//	UI_ANIMATION_UPDATE_RESULT result;
-//	UI_ANIMATION_SECONDS secTime;
-//	_animationTimer->GetTime(&secTime);
-//	_animationManager->Update(secTime, &result);
-//}
-
-
-//
-//HRESULT CSTXAnimationControl::OnManagerStatusChanged(UI_ANIMATION_MANAGER_STATUS newStatus, UI_ANIMATION_MANAGER_STATUS previousStatus)
-//{
-//	if (newStatus == UI_ANIMATION_MANAGER_BUSY)
-//	{
-//		StartAnimationTimer();
-//	}
-//	else
-//	{
-//		StopAnimationTimer();
-//		ClearPendingDeleteNodes();
-//		InvalidateRect(_hwndControl, NULL, TRUE);
-//	}
-//
-//	return S_OK;
-//}
-
-//void CSTXAnimationControl::OnMouseMove(int x, int y, UINT nFlags)
-//{
-//	int iHScrollPos = GetScrollPos(_hwndControl, SB_HORZ);
-//	int iVScrollPos = GetScrollPos(_hwndControl, SB_VERT);
-//
-//	CSTXAnimationControlWindow::OnMouseMove(x + iHScrollPos, y + iVScrollPos, nFlags);
-//	CSTXAnimationControlChildNode::OnMouseMove(x + iHScrollPos, y + iVScrollPos, nFlags);
-//
-//}
-//
-//void CSTXAnimationControl::OnLButtonDown(int x, int y, UINT nFlags, BOOL bForRButton /*= FALSE*/)
-//{
-//	int iHScrollPos = GetScrollPos(_hwndControl, SB_HORZ);
-//	int iVScrollPos = GetScrollPos(_hwndControl, SB_VERT);
-//
-//	CSTXAnimationControlWindow::OnLButtonDown(x + iHScrollPos, y + iVScrollPos, nFlags, bForRButton);
-//	CSTXAnimationControlChildNode::OnLButtonDown(x + iHScrollPos, y + iVScrollPos, nFlags, bForRButton);
-//}
-
-//void CSTXAnimationControl::OnLButtonUp(int x, int y, UINT nFlags, BOOL bForRButton /*= FALSE*/)
-//{
-//	int iHScrollPos = GetScrollPos(_hwndControl, SB_HORZ);
-//	int iVScrollPos = GetScrollPos(_hwndControl, SB_VERT);
-//
-//	CSTXAnimationControlWindow::OnLButtonUp(x + iHScrollPos, y + iVScrollPos, nFlags, bForRButton);
-//	CSTXAnimationControlChildNode::OnLButtonUp(x + iHScrollPos, y + iVScrollPos, nFlags, bForRButton);
-//
-//	if (_mouseDownNode)
-//	{
-//		_mouseDownNode->OnLButtonUp(x + iHScrollPos, y + iVScrollPos, nFlags, bForRButton);
-//		_mouseDownNode->Release();
-//		_mouseDownNode = NULL;
-//	}
-//}
-
-//void CSTXAnimationControl::OnMouseLeave()
-//{
-//	CSTXAnimationControlWindow::OnMouseLeave();
-//	CSTXAnimationControlChildNode::OnMouseLeave();
-//}
-
-//void CSTXAnimationControl::OnRButtonDown(int x, int y, UINT nFlags)
-//{
-//	CSTXAnimationControlWindow::OnRButtonDown(x, y, nFlags);
-//	CSTXAnimationControlChildNode::OnRButtonDown(x, y, nFlags);
-//
-//}
-//
-//void CSTXAnimationControl::OnRButtonUp(int x, int y, UINT nFlags)
-//{
-//	CSTXAnimationControlWindow::OnRButtonUp(x, y, nFlags);
-//	CSTXAnimationControlChildNode::OnRButtonUp(x, y, nFlags);
-//
-//	if (_mouseDownNode)
-//	{
-//		_mouseDownNode->OnRButtonUp(x, y, nFlags);
-//		_mouseDownNode->Release();
-//		_mouseDownNode = NULL;
-//	}
-//}
-
-//void CSTXAnimationControl::OnSize(UINT nType, int cx, int cy)
-//{
-//	CSTXAnimationControlWindow::OnSize(nType, cx, cy);
-//	CSTXAnimationControlChildNode::OnSize(nType, cx, cy);
-//}
-
-//void CSTXAnimationControl::OnLButtonDblClk(int x, int y, UINT nFlags)
-//{
-//	int iHScrollPos = GetScrollPos(_hwndControl, SB_HORZ);
-//	int iVScrollPos = GetScrollPos(_hwndControl, SB_VERT);
-//
-//	CSTXAnimationControlWindow::OnLButtonDblClk(x + iHScrollPos, y + iVScrollPos, nFlags);
-//	CSTXAnimationControlChildNode::OnLButtonDblClk(x + iHScrollPos, y + iVScrollPos, nFlags);
-//}
-
-//void CSTXAnimationControl::ResetScrollBars()
-//{
-//	if (!IsWindow(_hwndControl))
-//		return;
-//
-//	RECT rcClient;
-//	::GetClientRect(_hwndControl, &rcClient);
-//
-//	//Vertical Scroll Bar
-//	int iTotalHeightAvailable = rcClient.bottom - rcClient.top;
-//
-//	int iCurPos = 0;
-//	BOOL bVScrollExist;
-//	if ((GetWindowLong(_hwndControl, GWL_STYLE) & WS_VSCROLL) == WS_VSCROLL)
-//	{
-//		iCurPos = ::GetScrollPos(_hwndControl, SB_VERT);
-//		bVScrollExist = TRUE;
-//	}
-//	else
-//		bVScrollExist = FALSE;
-//
-//	int iOldPos = ::GetScrollPos(_hwndControl, SB_VERT);
-//
-//	int nTotalHeight = static_cast<int>(OnQueryNodeFinalHeight());
-//	if (_childNodes.size() > 0 && nTotalHeight > iTotalHeightAvailable)	//Need H-ScrollBar
-//	{
-//		SCROLLINFO si;
-//		si.cbSize = sizeof(si);
-//		si.fMask = SIF_PAGE | SIF_POS | SIF_RANGE;
-//		si.nPage = iTotalHeightAvailable;
-//		si.nMin = 0;
-//		si.nMax = nTotalHeight;
-//		si.nPos = min(iCurPos, si.nMax);
-//
-//		SetScrollPos(_hwndControl, SB_VERT, si.nPos, FALSE);
-//		SetScrollInfo(_hwndControl, SB_VERT, &si, TRUE);
-//		::ShowScrollBar(_hwndControl, SB_VERT, TRUE);
-//		ModifyStyle(0, WS_VSCROLL);
-//	}
-//	else
-//	{
-//		int iCurPos = GetScrollPos(_hwndControl, SB_VERT);
-//		//ScrollWindow(_hwndControl, 0, iCurPos, NULL, NULL);
-//		SetScrollPos(_hwndControl, SB_VERT, 0, TRUE);
-//		::ShowScrollBar(_hwndControl, SB_VERT, FALSE);
-//		ModifyStyle(WS_VSCROLL, 0);
-//	}
-//
-//	//Horizontal Scroll Bar
-//	ResetHorizontalScrollBar();
-//
-//	InvalidateRect(_hwndControl, NULL, FALSE);
-//
-//}
-//
-//void CSTXAnimationControl::ResetHorizontalScrollBar()
-//{
-//
-//}
-//
-//int CSTXAnimationControl::AddChildNode(CSTXAnimationControlChildNode *pNode)
-//{
-//	int nResult = __super::AddChildNode(pNode);
-//
-//	DOUBLE fHeightTotal = 0;
-//	if (_style.autoCalculateContentSize)
-//	{
-//		std::vector<CSTXAnimationControlChildNode*>::iterator it = _childNodes.begin();
-//		for (; it != _childNodes.end(); it++)
-//		{
-//			DOUBLE y = (*it)->GetFinalValue(_T("y"));
-//			DOUBLE h = (*it)->GetFinalValue(_T("height"));
-//
-//			if (fHeightTotal < y + h)
-//				fHeightTotal = y + h;
-//		}
-//
-//		SetValueInstantly(_T("height"), fHeightTotal);
-//	}
-//
-//	ResetScrollBars();
-//	return nResult;
-//}
-
-//void CSTXAnimationControl::OnDestroy()
-//{
-//#if _WIN32_WINNT >= 0x0601
-//	CSTXD2DGraphics::Clear(_hwndControl);
-//#endif
-//	CSTXGraphics::ClearCachedGraphicsObjects(_hwndControl);
-//}
-
-//void CSTXAnimationControl::OnQueryToolTipsText(LPTSTR pszBuffer, int cchBufferSize, POINT ptLocation, LPCTSTR *ppszToolTips)
-//{
-//	if (_mouseEnterNode)
-//	{
-//		_mouseEnterNode->OnQueryToolTipsText(pszBuffer, cchBufferSize, ptLocation, ppszToolTips);
-//	}
-//}
-
-//void CSTXAnimationControl::ClearPendingDeleteNodes()
-//{
-//	__super::ClearPendingDeleteNodes();
-//}
-
-
-
