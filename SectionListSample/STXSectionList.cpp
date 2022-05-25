@@ -316,9 +316,6 @@ void CSTXSectionList::RemoveItemFromSection(int nSectionIndex, int nItemIndex)
 
 POINT CSTXSectionList::CalculateItemLocation(int nSectionIndex, int nItemIndex)
 {
-	//if (nSectionIndex < 0 || nSectionIndex >= (int)_childNodes.size())
-	//	return;
-
 	CSTXAnimationControlChildNode *pSectionNode = _childNodes[nSectionIndex];
 
 	DOUBLE fCaptionHeight = pSectionNode->GetFinalValue(_T("captionHeight"));
@@ -446,14 +443,9 @@ void CSTXSectionListTitleNode::DrawNode(CSTXGraphics *pGraphics)
 	ANI_VAR_VALUE(scale, scale);
 
 	CSTXGraphicsBrush *pBrush = pGraphics->CreateSimpleLinearGradientBrush(0, 0, 0, 114, 198, 255, fw, ch, 255, 255, 255, 255, opacity);
-	//pBrush->SetOpacity(opacity);
 
 	CSTXGraphicsBrush *pBrushFont = pGraphics->CreateSolidBrush(255, 255, 255, static_cast<byte>(255 * GetAncestorOpacity()));
 	CSTXGraphicsFont *pFont = pGraphics->CreateDrawingFont(_T("Arial"), 12, TRUE, FALSE);
-
-	//TRY_GET_CACHED_OBJECT(pBrush, TitleBrush, CSTXGraphicsBrush, pGraphics->CreateSimpleLinearGradientBrush(0, 0, 0, 114, 198, 255, fw, ch, 255, 255, 255, 255));
-	//TRY_GET_CACHED_OBJECT(pBrushFont, WhiteTextBrush, CSTXGraphicsBrush, pGraphics->CreateSolidBrush(255, 255, 255, 255));
-	//TRY_GET_CACHED_OBJECT(pFont, DefaultFontBold, CSTXGraphicsFont, pGraphics->CreateDrawingFont(_T("Arial"), 12, TRUE, FALSE));
 
 	CSTXGraphicsTextFormat tf;
 
@@ -538,18 +530,12 @@ void CSTXSectionListContentNode::DrawNode(CSTXGraphics *pGraphics)
 	CSTXGraphicsBrush *pBrush2 = pGraphics->CreateButtonGradientBrush(0, 0, fw, fh, 86, 146, 146, static_cast<byte>(255 * GetAncestorOpacity() * opacity), 90);
 	CSTXGraphicsBrush *pBrush3 = pGraphics->CreateButtonGradientBrush(0, 0, fw, fh, 168, 146, 146, static_cast<byte>(255 * GetAncestorOpacity() * opacity), 90);
 
-	//TRY_GET_CACHED_OBJECT(pBrush1, ContentBrush1, CSTXGraphicsBrush, pGraphics->CreateButtonGradientBrush(0, 0, fw, fh, 102, 168, 168, 255, 90));
-	//TRY_GET_CACHED_OBJECT(pBrush2, ContentBrush2, CSTXGraphicsBrush, pGraphics->CreateButtonGradientBrush(0, 0, fw, fh, 86, 146, 146, 255, 90));
-	//TRY_GET_CACHED_OBJECT(pBrush3, ContentBrush3, CSTXGraphicsBrush, pGraphics->CreateButtonGradientBrush(0, 0, fw, fh, 168, 146, 146, 255, 90));
 	CSTXGraphicsBrush *pBrush[3] = { pBrush1, pBrush2, pBrush3 };
 	_bkBrush = pBrush[_type];
 	_bkBrush->SetOpacity(static_cast<byte>(255 * GetAncestorOpacity() * opacity));
 
 	CSTXGraphicsBrush *pBrushFont = pGraphics->CreateSolidBrush(255, 255, 255, static_cast<byte>(255 * GetAncestorOpacity() * opacity));
 	CSTXGraphicsFont *pFont = pGraphics->CreateDrawingFont(_T("Arial"), 12, TRUE, FALSE);
-
-	//TRY_GET_CACHED_OBJECT(pBrushFont, WhiteTextBrush, CSTXGraphicsBrush, pGraphics->CreateSolidBrush(255, 255, 255, 255));
-	//TRY_GET_CACHED_OBJECT(pFont, DefaultFontBold, CSTXGraphicsFont, pGraphics->CreateDrawingFont(_T("Arial"), 12, TRUE, FALSE));
 
 	CSTXGraphicsTextFormat tf;
 	tf._alignment = 1;
@@ -609,17 +595,10 @@ void CSTXSectionListContentNode::OnLButtonClick()
 	int nIndex = GetIndexInParentNode();
 	int nSectionIndex = GetParentNode()->GetIndexInParentNode();
 	((CSTXSectionList*)GetParentControl())->RemoveItemFromSection(nSectionIndex, nIndex);
-
-	//SetValue(_T("opacity"), 0);
-	//SetValue(_T("scale"), 0.01);
-	//SetValue(_T("rotate"), -360);
-
-	//_parentNode->RemoveChildNode(nIndex);
 }
 
 void CSTXSectionListContentNode::OnMouseEnter()
 {
-	//SetValue(_T("scale"), 1.1, 0.1);
 	__super::OnMouseEnter();
 
 	std::wstring s = _T("CSTXSectionListContentNode::OnMouseEnter  ");
@@ -647,7 +626,6 @@ void CSTXSectionListContentNode::OnLButtonDblClk(int x, int y, UINT nFlags)
 
 void CSTXSectionListContentNode::OnQueryToolTipsText(LPTSTR pszBuffer, int cchBufferSize, POINT ptLocation, LPCTSTR *ppszToolTips)
 {
-	//_tcscpy_s(pszBuffer, cchBufferSize, _caption.c_str());
 	*ppszToolTips = _caption.c_str();
 	__super::OnQueryToolTipsText(pszBuffer, cchBufferSize, ptLocation, ppszToolTips);
 }
@@ -704,22 +682,12 @@ void CSTXSectionListTipNode::DrawNode(CSTXGraphics *pGraphics)
 	CSTXGraphicsBrush *pBrush3 = pGraphics->CreateSolidBrush(255, 255, 255, ancestorOpacity / 4);
 	CSTXGraphicsBrush *pBrush4 = pGraphics->CreateButtonGradientBrush(0, 0, fw, fh, 63, 169, 63, ancestorOpacity, 90);
 
-
-	//TRY_GET_CACHED_OBJECT(pBrush1, TipsBrushEmpty, CSTXGraphicsBrush, pGraphics->CreateButtonGradientBrush(0, 0, fw, fh, 192, 192, 192, 255, 90));
-	//TRY_GET_CACHED_OBJECT(pBrush2, TipsBrushAvailable, CSTXGraphicsBrush, pGraphics->CreateButtonGradientBrush(0, 0, fw, fh, 255, 37, 37, 255, 90));
-	//TRY_GET_CACHED_OBJECT(pBrush3, TipsTopLeftBackground, CSTXGraphicsBrush, pGraphics->CreateSolidBrush(255, 255, 255, 64));
-	//TRY_GET_CACHED_OBJECT(pBrush4, TipsBottomLeftBackground, CSTXGraphicsBrush, pGraphics->CreateButtonGradientBrush(0, 0, fw, fh, 63, 169, 63, 255, 90));
 	CSTXGraphicsBrush *pBrushs[4] = { pBrush1, pBrush2, pBrush3, pBrush4 };
-
-
-	//TRY_GET_CACHED_OBJECT(pBrushFont, WhiteTextBrush, CSTXGraphicsBrush, pGraphics->CreateSolidBrush(255, 255, 255, 255));
 
 	CSTXGraphicsFont *pFont1 = pGraphics->CreateDrawingFont(_T("Arial"), 12, FALSE, FALSE);
 	CSTXGraphicsFont *pFont2 = pGraphics->CreateDrawingFont(_T("Arial"), 12, TRUE, FALSE);
 	CSTXGraphicsFont *pFont3 = pGraphics->CreateDrawingFont(_T("Arial"), 24, TRUE, FALSE);
-	//TRY_GET_CACHED_OBJECT(pFont1, DefaultFont, CSTXGraphicsFont, pGraphics->CreateDrawingFont(_T("Arial"), 12, FALSE, FALSE));
-	//TRY_GET_CACHED_OBJECT(pFont2, DefaultFontBold, CSTXGraphicsFont, pGraphics->CreateDrawingFont(_T("Arial"), 12, TRUE, FALSE));
-	//TRY_GET_CACHED_OBJECT(pFont3, DefaultFontBoldBig, CSTXGraphicsFont, pGraphics->CreateDrawingFont(_T("Arial"), 24, TRUE, FALSE));
+
 	CSTXGraphicsFont *pFonts[3] = { pFont1, pFont2, pFont3 };
 
 	CSTXGraphicsBrush *pBrush = NULL;
@@ -778,12 +746,6 @@ void CSTXSectionListTipNode::DrawNode(CSTXGraphics *pGraphics)
 	{
 		pGraphics->DrawString(_caption.c_str(), 0, 0, w, h, pFont, pBrushFont, &tf);
 	}
-
-	//CSTXGraphicsImageFormat imageFormat;
-	//imageFormat._grey = TRUE;
-	//CSTXGraphicsImage *p = pGraphics->CreateDrawingImage(_T("C:\\1.png"));
-	//pGraphics->DrawImage(0, 0, w, h, p, &imageFormat);
-	//delete p;
 
 	pGraphics->SetTransform(pMatrixOld);
 

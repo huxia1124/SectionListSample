@@ -1195,10 +1195,6 @@ LRESULT CALLBACK CSTXAnimationControlWindow::STXAnimatedControlWindowProc(HWND h
 	default:
 		break;
 	}
-	//LRESULT res = pThis->OnPreWndProc(GET_X_LPARAM(pos), GET_Y_LPARAM(pos), hwnd, uMsg, wParam, lParam);
-
-	//if (res != S_FALSE)
-	//	return res;
 
 	switch (uMsg)
 	{
@@ -1253,40 +1249,10 @@ LRESULT CALLBACK CSTXAnimationControlWindow::STXAnimatedControlWindowProc(HWND h
 		if (pThis->OnSetCursor( (HWND)wParam, LOWORD(lParam), HIWORD(lParam)))
 			return DefWindowProc(hwnd, uMsg, wParam, lParam);
 		break;
-	case WM_CTLCOLOREDIT:
-		//SetBkMode((HDC)wParam, TRANSPARENT);
-		//SetTextColor((HDC)wParam, RGB(255, 0, 0));
-
-
-
-		//{
-		//	HDC hdc = (HDC)wParam;
-		//	SetBkMode(hdc, TRANSPARENT); // Ensure that "static" text doesn't use a solid fill
-		//	POINT pt;
-		//	pt.x = 0; pt.y = 0;
-		//	MapWindowPoints((HWND)lParam, hwnd, &pt, 1);
-		//	SetBrushOrgEx(hdc, -pt.x, -pt.y, NULL);
-		//}
-
-		////return (LRESULT)GetSysColorBrush(COLOR_HIGHLIGHT);
-		//return (LRESULT)GetStockObject(HOLLOW_BRUSH);
-		//OutputDebugString(_T("ASDFF\n"));
-		break;
 	case WM_ERASEBKGND:
 		return pThis->OnEraseBackground((HDC)wParam);
 		break;
-	//case WM_NCPAINT:
-	//	{
-	//		HDC hdc;
-	//		hdc = GetDCEx(hwnd, (HRGN)wParam, DCX_WINDOW | DCX_INTERSECTRGN);
-	//		// Paint into this DC 
-	//		ReleaseDC(hwnd, hdc);
-	//		return NULL;
-	//	}
-	//	break;
 	}
-
-
 
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
