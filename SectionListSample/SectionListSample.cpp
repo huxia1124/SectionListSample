@@ -108,6 +108,18 @@ void InitializeSectionList()
 
 }
 
+void AddSectionListContentNode()
+{
+    if (pSectionList == NULL)
+        return;
+
+    int nSecIndex = rand() % pSectionList->GetChildrenCount();
+    int nIndex = pSectionList->AddItemToSection(nSecIndex, _T("More"));
+    pSectionList->SetItemTipLeftTop(nSecIndex, nIndex, _T("M"));
+    pSectionList->SetItemTipLeftBottom(nSecIndex, nIndex, _T("$32.00"));
+    pSectionList->SetItemTipCount(nSecIndex, nIndex, rand() % 3);
+}
+
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPWSTR    lpCmdLine,
@@ -240,6 +252,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             case IDM_EXIT:
                 DestroyWindow(hWnd);
                 break;
+            case ID_SECTIONLIST_ADDRANDOMITEMS:
+            {
+                // Add 5 items
+                for (int i = 0; i < 5; ++i)
+                {
+                    AddSectionListContentNode();
+                }
+            }
+            break;
             default:
                 return DefWindowProc(hWnd, message, wParam, lParam);
             }
