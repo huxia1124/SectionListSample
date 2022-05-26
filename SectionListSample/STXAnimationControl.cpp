@@ -68,23 +68,24 @@ IUIAnimationVariable* CSTXAnimationObjectBase::GetAnimationVariable(LPCTSTR lpsz
 
 
 CSTXAnimationControlChildNode::CSTXAnimationControlChildNode()
+	: _mouseEnterNode(nullptr)
+	, _mouseDownNode(nullptr)
+	, _thisNodeMouseDown(FALSE)
+	, _mouseDownChildNode(nullptr)
+	, _mouseDownNodeRButton(FALSE)
+	, _parentNode(nullptr)
+	, _parentControl(nullptr)
+	, _order(0)
+	, _visible(TRUE)
+	, _deletePending(FALSE)
+	, _drawingCountAfterDelete(0)
+	, _pendingTransition(0)
+	, _pPendingTransition(&_pendingTransition)
+	, _nestedSetValue(0)
+	, _ptLButtonDown{-1, -1}
+	, _mouseDraggingNode(nullptr)
+	, _focusNode(nullptr)
 {
-	_parentControl = NULL;
-	_parentNode = NULL;
-	_mouseDownNode = NULL;
-	_mouseEnterNode = NULL;
-	_visible = TRUE;
-	_drawingCountAfterDelete = 0;
-	_deletePending = FALSE;
-	_mouseDownNodeRButton = FALSE;
-	_pendingTransition = 0;
-	_pPendingTransition = &_pendingTransition;
-	_nestedSetValue = 0;
-	_mouseDraggingNode = NULL;
-	m_ptLButtonDown.x = m_ptLButtonDown.y = 0;
-	_mouseDownChildNode = NULL;
-	_thisNodeMouseDown = FALSE;
-	_focusNode = NULL;
 }
 
 CSTXAnimationControlChildNode::~CSTXAnimationControlChildNode()
@@ -336,7 +337,7 @@ void CSTXAnimationControlChildNode::OnMouseMove(int x, int y, UINT nFlags)
 
 	if (_mouseDraggingNode)
 	{
-		POINT ptOffset = { x - m_ptLButtonDown.x, y - m_ptLButtonDown.y };
+		POINT ptOffset = { x - _ptLButtonDown.x, y - _ptLButtonDown.y };
 		_mouseDraggingNode->OnMouseDragging(pt, ptOffset);
 		return;
 	}
@@ -390,7 +391,7 @@ void CSTXAnimationControlChildNode::OnMouseMove(int x, int y, UINT nFlags)
 		}
 	}
 
-	if (!bInAnyChild && _thisNodeMouseDown && _mouseDownChildNode == NULL && _mouseDraggingNode == NULL && (abs(m_ptLButtonDown.y - y) > 5 || abs(m_ptLButtonDown.x - x) > 5))
+	if (!bInAnyChild && _thisNodeMouseDown && _mouseDownChildNode == NULL && _mouseDraggingNode == NULL && (abs(_ptLButtonDown.y - y) > 5 || abs(_ptLButtonDown.x - x) > 5))
 	{
 		_mouseDraggingNode = this;
 		_mouseDraggingNode->AddRef();
@@ -439,8 +440,8 @@ void CSTXAnimationControlChildNode::OnLButtonDown(int x, int y, UINT nFlags, BOO
 	std::vector<CSTXAnimationControlChildNode*>::iterator it = _childNodes.begin();
 	std::queue<CSTXAnimationControlChildNode*> queueNodes;
 
-	m_ptLButtonDown.x = x;
-	m_ptLButtonDown.y = y;
+	_ptLButtonDown.x = x;
+	_ptLButtonDown.y = y;
 
 	for (; it != _childNodes.end(); it++)
 	{
@@ -502,7 +503,7 @@ void CSTXAnimationControlChildNode::OnLButtonUp(int x, int y, UINT nFlags, BOOL 
 
 	if (_mouseDraggingNode)
 	{
-		POINT ptOffset = { x - m_ptLButtonDown.x, y - m_ptLButtonDown.y };
+		POINT ptOffset = { x - _ptLButtonDown.x, y - _ptLButtonDown.y };
 		_mouseDraggingNode->OnEndMouseDragging(pt, ptOffset);
 		_mouseDraggingNode->Release();
 		_mouseDraggingNode = NULL;
@@ -1119,17 +1120,17 @@ void CSTXAnimationControlChildNode::SetValueIntegerChangeEventHandler(LPCTSTR lp
 //////////////////////////////////////////////////////////////////////////
 
 CSTXAnimationControlWindow::CSTXAnimationControlWindow()
+	: _hwndControl(nullptr)
+	, _hwndToolTips(nullptr)
+	, _trackingMouse(FALSE)
+	, _graphicsCacheId(19999901)
 {
 	_animationManager.CoCreateInstance(CLSID_UIAnimationManager);
 	_animationTimer.CoCreateInstance(CLSID_UIAnimationTimer);
 	_animationTransitionLibrary.CoCreateInstance(CLSID_UIAnimationTransitionLibrary);
 
-	_hwndControl = NULL;
-	_hwndToolTips = NULL;
 	_style.drawNodesInViewOnly = TRUE;
 	_style.autoCalculateContentSize = TRUE;
-	_trackingMouse = FALSE;
-	_graphicsCacheId = 19999901;
 }
 
 CSTXAnimationControlWindow::~CSTXAnimationControlWindow()

@@ -141,7 +141,7 @@ protected:
 	long _pendingTransition;
 	long *_pPendingTransition;
 	long _nestedSetValue;
-	POINT m_ptLButtonDown;
+	POINT _ptLButtonDown;
 	CSTXAnimationControlChildNode *_mouseDraggingNode;
 	CSTXAnimationControlChildNode *_focusNode;
 
@@ -241,7 +241,6 @@ protected:
 	HWND _hwndToolTips;
 	AnimationControlStyle _style;
 	BOOL _trackingMouse;
-	TOOLINFO g_toolItem;
 	UINT _graphicsCacheId;
 
 protected:

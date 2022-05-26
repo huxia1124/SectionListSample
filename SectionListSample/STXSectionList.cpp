@@ -16,8 +16,8 @@
 	}
 
 CSTXSectionList::CSTXSectionList()
+	: _itemsPerLine(1)
 {
-	_itemsPerLine = 1;
 }
 
 
