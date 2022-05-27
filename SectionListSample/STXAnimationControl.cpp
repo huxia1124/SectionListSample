@@ -817,7 +817,7 @@ int CSTXAnimationControlChildNode::GetIndexInParentNode()
 	if (it == _parentNode->_childNodes.end())
 		return -1;
 
-	return it - _parentNode->_childNodes.begin();
+	return static_cast<int>(it - _parentNode->_childNodes.begin());
 }
 
 byte CSTXAnimationControlChildNode::GetAncestorOpacityByte()
@@ -1204,22 +1204,22 @@ LRESULT CALLBACK CSTXAnimationControlWindow::STXAnimatedControlWindowProc(HWND h
 		pThis->OnTimer(static_cast<UINT>(wParam));
 		break;
 	case WM_MOUSEMOVE:
-		pThis->OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+		pThis->OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), static_cast<UINT>(wParam));
 		break;
 	case WM_LBUTTONDOWN:
-		pThis->OnLButtonDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+		pThis->OnLButtonDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), static_cast<UINT>(wParam));
 		break;
 	case WM_LBUTTONUP:
-		pThis->OnLButtonUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+		pThis->OnLButtonUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), static_cast<UINT>(wParam));
 		break;
 	case WM_RBUTTONDOWN:
-		pThis->OnRButtonDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+		pThis->OnRButtonDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), static_cast<UINT>(wParam));
 		break;
 	case WM_RBUTTONUP:
-		pThis->OnRButtonUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+		pThis->OnRButtonUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), static_cast<UINT>(wParam));
 		break;
 	case WM_LBUTTONDBLCLK:
-		pThis->OnLButtonDblClk(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+		pThis->OnLButtonDblClk(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), static_cast<UINT>(wParam));
 		break;
 	case WM_MOUSELEAVE:
 		pThis->OnMouseLeave();
@@ -1228,7 +1228,7 @@ LRESULT CALLBACK CSTXAnimationControlWindow::STXAnimatedControlWindowProc(HWND h
 		pThis->OnMouseWheel(GET_KEYSTATE_WPARAM(wParam), GET_WHEEL_DELTA_WPARAM(wParam), LOWORD(lParam), HIWORD(lParam));
 		break;
 	case WM_SIZE:
-		pThis->OnSize(wParam, LOWORD(lParam), HIWORD(lParam));
+		pThis->OnSize(static_cast<UINT>(wParam), LOWORD(lParam), HIWORD(lParam));
 		break;
 	case WM_HSCROLL:
 		pThis->OnHScroll(LOWORD(wParam), HIWORD(wParam), (HWND)lParam);
@@ -1265,7 +1265,7 @@ BOOL CSTXAnimationControlWindow::Create(LPCTSTR lpszWindowText, DWORD dwStyle, i
 		RegisterAnimationControlClass(lpszClassName);
 	}
 
-	HWND hWnd = CreateWindow(GetControlClassName(), lpszWindowText, dwStyle, x, y, cx, cy, hWndParent, (HMENU)nID, GetModuleHandle(NULL), NULL);
+	HWND hWnd = CreateWindow(GetControlClassName(), lpszWindowText, dwStyle, x, y, cx, cy, hWndParent, reinterpret_cast<HMENU>(static_cast<UINT_PTR>(nID)), GetModuleHandle(NULL), NULL);
 	if (hWnd == NULL)
 		return FALSE;
 
@@ -1313,7 +1313,7 @@ void CSTXAnimationControlWindow::RegisterAnimationControlClass(LPCTSTR lpszClass
 	wc.lpfnWndProc = STXAnimatedControlWindowProc;
 	wc.lpszClassName = lpszClassName;
 	wc.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
-	wc.hCursor = ::LoadCursor(NULL, MAKEINTRESOURCE(IDC_ARROW));
+	wc.hCursor = ::LoadCursor(NULL, IDC_ARROW);
 
 	RegisterClass(&wc);
 }
@@ -2637,7 +2637,7 @@ DWORD CSTXAnimationControlEdit::GetTextLength()
 	
 	LRESULT res = 0;
 	_textService->TxSendMessage(EM_GETTEXTLENGTHEX, (WPARAM)&lengthEx, 0, &res);
-	return res;
+	return static_cast<DWORD>(res);
 }
 
 void CSTXAnimationControlEdit::GetText(LPTSTR pBuffer, UINT cchBufferLength)
